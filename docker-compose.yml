@@ -1,0 +1,51 @@
+services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - /var/www/html:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - default
+        
+  database:
+    image: postgres:alpine
+    container_name: storage-database
+    restart: always
+    env_file:
+      - ./config/.env
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - default
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile
+    image: django
+    container_name: storage-backend
+    restart: always
+    depends_on:
+      - database
+    volumes:
+      - ./services:/app
+      - /var/www/html:/app/media
+    env_file:
+      ./config/.env
+    ports:
+      - '8000:8000'
+    command: sh -c  "chmod +x /app/start.django.sh && /app/start.django.sh"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
