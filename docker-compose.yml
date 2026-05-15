@@ -1,9 +1,10 @@
 services:
   nginx:
+    container_name: server-nginx
     image: nginx:latest
     volumes:
       - /var/www/html:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - '80:80'
@@ -38,7 +39,7 @@ services:
       - database
     volumes:
       - ./services:/app
-      - /var/www/html:/app/media
+      - /var/www/html/media:/app/media
     env_file:
       ./config/.env
     ports:
