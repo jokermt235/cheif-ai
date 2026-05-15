@@ -5,7 +5,7 @@ set -o pipefail
 set -o nounset
 
 mkdir -p static
-#python manage.py makemigrations
+python manage.py makemigrations
 #python manage.py migrate --run-syncdb
 python manage.py collectstatic --noinput
 

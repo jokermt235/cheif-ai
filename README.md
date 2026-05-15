@@ -1,10 +1,25 @@
-#Author Mutalip
-* To start project properly
+# Author: Mutalip
 
-1. install docker,docker compose on your machine
-2. Ensure your ports 80,5432,8000 are open and not binded to other applications
-3. Copy config/env.example file into confing/.env and configure it to your needs
-4. Run  in terminal the commands below
-   docker compose build
-   docker compose up 
-   
+## Project Setup
+
+Follow the steps below to set up and run the project locally.
+
+### Prerequisites
+
+Before starting, make sure the following tools are installed on your machine:
+
+- Docker
+- Docker Compose
+
+Also ensure that the following ports are available and not used by other applications:
+
+- `80`
+- `5432`
+- `8000`
+
+### Environment Configuration
+
+Copy the example environment file and create your local configuration:
+
+```bash
+cp config/env.example config/.env
