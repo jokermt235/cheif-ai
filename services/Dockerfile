@@ -26,3 +26,7 @@ RUN ls /app/
 
 # Requirements are installed here to ensure they will be cached.
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+
+RUN chmod +x ./start.django.sh
+
+CMD ["/bin/bash", "./start.django.sh"]
