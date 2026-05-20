@@ -41,7 +41,7 @@ services:
       - ./services:/app
       - /var/www/html/media:/app/media
     env_file:
-      ./config/.env
+      - ./config/.env
     ports:
       - '8000:8000'
     command: sh -c  "chmod +x /app/start.django.sh && /app/start.django.sh"
