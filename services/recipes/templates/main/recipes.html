@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Рецепты</title>
+</head>
+<body>
+    <h1>Поиск рецептов</h1>
+
+    <input type="text" id="query" placeholder="молоко яйца мука">
+    <button onclick="search()">Найти</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function search() {
+            const query = document.getElementById('query').value.trim();
+            if (!query) return;
+
+            const res = await fetch(`/api/search/?ingredients=${encodeURIComponent(query)}`);
+            const recipes = await res.json();
+            const container = document.getElementById('results');
+
+            if (recipes.length === 0) {
+                container.innerHTML = '<p>Рецепты не найдены</p>';
+                return;
+            }
+
+            container.innerHTML = recipes.map(r => `
+                <div>
+                    <h3>${r.name}</h3>
+                    <p>${r.ingredients.map(i => i.name).join(', ')}</p>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('query').addEventListener('keypress', e => {
+            if (e.key === 'Enter') search();
+        });
+    </script>
+</body>
+</html>
