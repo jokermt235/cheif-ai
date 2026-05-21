@@ -32,8 +32,8 @@ services:
     build:
       context: .
       dockerfile: ./services/Dockerfile
-      platforms:
-        - linux/arm64
+      # platforms:
+      #  - linux/arm64
     image: django
     container_name: storage-backend
     restart: always
