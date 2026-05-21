@@ -18,3 +18,7 @@ COPY services/pyproject.toml /app/
 COPY services/. /app/
 
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+
+RUN chmod +x ./start.django.sh
+
+CMD ["/bin/bash", "./start.django.sh"]

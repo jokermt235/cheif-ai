@@ -80,12 +80,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'api.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://your-frontend-link.onrender.com",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
 DJANGO_INJECTOR_MODULES = [
-    "stoeage.container.Container",
+    "storage.container.Container",
 ]
 
 TEMPLATES = [
@@ -138,7 +140,7 @@ LOGGING = {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": "/var/log/django.log",
+            "filename": os.path.join(BASE_DIR, "django.log"),
         },
         'console': {
             'class': 'logging.StreamHandler',
