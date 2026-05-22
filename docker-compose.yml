@@ -46,7 +46,7 @@ services:
       - ./config/.env
     ports:
       - '8000:8000'
-    command: sh -c "chmod +x /app/start.django.sh && poetry run /app/start.django.sh"
+    command: sh /app/start.django.sh
     networks:
       - default
 
