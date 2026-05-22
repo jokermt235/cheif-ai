@@ -18,13 +18,14 @@ schema_view = get_schema_view(
 urlpatterns = [
     # Админка
     path('api/admin/', admin.site.urls),
-    
     path('api/storage/', include('storage.urls')),
     
     # Авторизация
     path('api/auth/', include('allauth.urls')),
-
     path('api/drf-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    # Рецепты (изменения Байсала)
+    path('', include('recipes.urls')),
 
     # Документация API
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

@@ -38,6 +38,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', 'ch
 # Application definition
 
 DEFAULT_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,6 +63,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'storage',
+    'recipes',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS +  LOCAL_APPS
