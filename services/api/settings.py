@@ -18,6 +18,8 @@ import os
 env = environ.Env()
 environ.Env.read_env()
 
+GROK_API_KEY = env('GROK_API_KEY', default='')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -87,7 +89,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 DJANGO_INJECTOR_MODULES = [
-    "stoeage.container.Container",
+    "storage.container.Container",
 ]
 
 TEMPLATES = [

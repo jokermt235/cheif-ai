@@ -24,7 +24,9 @@ djangorestframework-simplejwt = "^5.2.2"
 djangorestframework = "^3.14.0"
 firebase-admin = "^6.1.0"
 requests = "*"
-django-cors-headers="*"
+django-cors-headers = "*"
+openai = "*"
+PyJWT = "*"
 
 [tool.poetry.dev-dependencies]
 

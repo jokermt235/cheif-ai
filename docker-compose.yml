@@ -16,7 +16,7 @@ services:
       - default
 
   database:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: storage-database
     restart: always
     env_file:
@@ -32,8 +32,7 @@ services:
     build:
       context: .
       dockerfile: ./services/Dockerfile
-      platforms:
-        - linux/arm64
+
     image: django
     container_name: storage-backend
     restart: always
