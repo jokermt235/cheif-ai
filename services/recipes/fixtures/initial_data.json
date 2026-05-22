@@ -1,0 +1,53 @@
+[
+{
+  "model": "recipes.ingredient",
+  "pk": 2,
+  "fields": {
+    "name": "milk"
+  }
+},
+{
+  "model": "recipes.ingredient",
+  "pk": 3,
+  "fields": {
+    "name": "sugar"
+  }
+},
+{
+  "model": "recipes.ingredient",
+  "pk": 4,
+  "fields": {
+    "name": "egg"
+  }
+},
+{
+  "model": "recipes.ingredient",
+  "pk": 5,
+  "fields": {
+    "name": "butter"
+  }
+},
+{
+  "model": "recipes.recipe",
+  "pk": 1,
+  "fields": {
+    "name": "Pancake",
+    "ingredients": [
+      2,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "recipes.recipe",
+  "pk": 2,
+  "fields": {
+    "name": "Omelette",
+    "ingredients": [
+      4,
+      5
+    ]
+  }
+}
+]
