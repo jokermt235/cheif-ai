@@ -49,6 +49,7 @@ DEFAULT_APPS = [
 THIRD_PARTY_APPS = [
     'django_injector',
     'rest_framework',
+    'drf_yasg',
     'corsheaders',
     'rest_framework.authtoken',
     'django.contrib.sites',
