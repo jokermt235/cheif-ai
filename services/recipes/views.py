@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from django.shortcuts import render
 from .models import Recipe, Ingredient
 from .serializers import RecipeSerializer, IngredientSerializer
+from storage.infrastructure.grok_repository import GrokRecipeRepository
+from storage.application.recipe_service import RecipeService
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -33,6 +35,25 @@ def search_by_ingredients(request):
     recipes = Recipe.objects.all()
     for name in names:
         recipes = recipes.filter(ingredients__name__icontains=name)
+    recipes = recipes.distinct()
 
-    serializer = RecipeSerializer(recipes.distinct(), many=True)
-    return Response(serializer.data)
+    if recipes.exists():
+        serializer = RecipeSerializer(recipes, many=True)
+        return Response({"source": "db", "data": serializer.data})
+
+    try:
+        service = RecipeService(repository=GrokRecipeRepository())
+        result = service.analyze_from_text(ingredients)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+    saved = []
+    for r in result.recipes:
+        recipe = Recipe.objects.create(name=r.name)
+        for ing_name in r.ingredients:
+            ingredient, _ = Ingredient.objects.get_or_create(name=ing_name)
+            recipe.ingredients.add(ingredient)
+        saved.append(recipe)
+
+    serializer = RecipeSerializer(saved, many=True)
+    return Response({"source": "ai", "data": serializer.data})

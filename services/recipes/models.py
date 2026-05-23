@@ -20,3 +20,13 @@ class Recipe(models.Model):
     class Meta:
         verbose_name_plural = "Recipes"
         verbose_name = "Recipe"
+
+
+
+
+
+
+
+
+
+        

@@ -16,7 +16,7 @@ services:
       - default
 
   database:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: storage-database
     restart: always
     env_file:
