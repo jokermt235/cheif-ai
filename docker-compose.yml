@@ -28,7 +28,7 @@ services:
     networks:
       - default
 
-backend:
+  backend:
     build:
       context: .
       dockerfile: ./services/Dockerfile
@@ -47,6 +47,7 @@ backend:
     command: sh -c "chmod +x /app/start.django.sh && sh /app/start.django.sh"
     networks:
       - default
+
 networks:
   default:
     driver: bridge
