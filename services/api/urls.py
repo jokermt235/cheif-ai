@@ -3,10 +3,11 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from django.conf import settings
-from django.conf.urls.static import static
 
-# Настройка Swagger документации
+# Импортируем вьюхи Байсала напрямую сюда
+from recipes.views import recipes_page, search_by_ingredients
+from recipes.urls import router as recipes_router
+
 schema_view = get_schema_view(
    openapi.Info(
       title="Chief AI API",
@@ -18,21 +19,23 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # Админка
+    # 1. Админка
     path('api/admin/', admin.site.urls),
     
+    # 2. Хранилище
     path('api/storage/', include('storage.urls')),
     
-    path('', include('recipes.urls')),  # <-- ИЗМЕНИЛИ ЗДЕСЬ (убрали api/)
+    # 3. API Рецептов 
+    path('api/', include(recipes_router.urls)),
+    path('api/search/', search_by_ingredients, name='search'),
     
-    # Авторизация
+    path('', recipes_page, name='recipes_page'),
+    
+    # 5. Авторизация
     path('api/auth/', include('allauth.urls')),
     path('api/drf-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    # API
+    # 6. Документация API
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
