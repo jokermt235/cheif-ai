@@ -6,12 +6,12 @@ set -o nounset
 
 mkdir -p static
 
+# 1. Работа с миграциями и статикой
 python manage.py makemigrations
-
 python manage.py migrate
-
 python manage.py collectstatic --noinput
 
+# 2. Автоматическое создание суперпользователя
 python manage.py shell -c "
 from storage.models import User; 
 import os;
@@ -24,5 +24,6 @@ else:
     print('Superuser already exists.')
 "
 
+# 3. Настройка и запуск сервера
 export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-" -b 0.0.0.0:8000 --timeout 30 --graceful-timeout 30 --forwarded-allow-ips=* --max-requests=10000 --chdir=/app"}
 gunicorn api.wsgi:application
