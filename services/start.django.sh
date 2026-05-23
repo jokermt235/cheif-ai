@@ -9,6 +9,7 @@ mkdir -p static
 # 1. Работа с миграциями и статикой
 python manage.py makemigrations
 python manage.py migrate
+python manage.py loaddata initial_data.json
 python manage.py collectstatic --noinput
 
 # 2. Автоматическое создание суперпользователя
