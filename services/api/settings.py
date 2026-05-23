@@ -18,6 +18,8 @@ import os
 env = environ.Env()
 environ.Env.read_env()
 
+GROK_API_KEY = env('GROK_API_KEY', default='')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +40,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', 'ch
 # Application definition
 
 DEFAULT_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,6 +64,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'storage',
+    'recipes',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS +  LOCAL_APPS

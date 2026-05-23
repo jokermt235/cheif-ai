@@ -28,12 +28,10 @@ services:
     networks:
       - default
 
-  backend:
+backend:
     build:
       context: .
       dockerfile: ./services/Dockerfile
-      # platforms:
-      #  - linux/arm64
     image: django
     container_name: storage-backend
     restart: always
@@ -46,10 +44,9 @@ services:
       - ./config/.env
     ports:
       - '8000:8000'
-    command: sh -c "chmod +x /app/start.django.sh && poetry run /app/start.django.sh"
+    command: sh -c "chmod +x /app/start.django.sh && sh /app/start.django.sh"
     networks:
       - default
-
 networks:
   default:
     driver: bridge
