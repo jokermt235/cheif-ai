@@ -52,6 +52,7 @@ DEFAULT_APPS = [
 THIRD_PARTY_APPS = [
     'django_injector',
     'rest_framework',
+    'drf_yasg',
     'corsheaders',
     'rest_framework.authtoken',
     'django.contrib.sites',
@@ -132,7 +133,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'storage.backends.JWTAuthentication',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+    # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
 }
