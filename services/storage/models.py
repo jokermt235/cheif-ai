@@ -38,3 +38,14 @@ class User(AbstractUser):
       'exp': int(dt.strftime('%s'))
       }, settings.SECRET_KEY, algorithm='HS256')
     return token
+
+class RecipeCache(models.Model):
+    ingredients_key = models.CharField(max_length=500, unique=True, db_index=True)
+    result = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'recipe_cache'
+
+    def __str__(self):
+        return self.ingredients_key

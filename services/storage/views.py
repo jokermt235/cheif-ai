@@ -9,6 +9,10 @@ from storage.backends import JWTAuthentication
 from injector import inject
 from storage.services import FileUploadService
 
+from storage.application.recipe_service import RecipeService
+from dataclasses import asdict
+import logging
+
 class FileUploadAPIView(APIView):
   
   parser_classes = [MultiPartParser]
@@ -56,3 +60,37 @@ class RefreshAPIView(APIView):
     return Response({"message" : "Error"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class RecipeAnalyzeAPIView(APIView):
+    parser_classes = [MultiPartParser]
+    permission_classes = [AllowAny]
+
+    def __init__(self, **kwargs):
+      super().__init__(**kwargs)
+      from storage.infrastructure.grok_repository import GrokRecipeRepository
+      from storage.application.recipe_service import RecipeService
+      self._recipe_service = RecipeService(repository=GrokRecipeRepository())
+
+    def post(self, request, format=None):
+        try:
+            if 'file' in request.FILES and request.FILES['file']:
+                result = self._recipe_service.analyze_from_image(request.FILES['file'])
+            else:
+                ingredients = request.data.get('ingredients', '')
+                result = self._recipe_service.analyze_from_text(ingredients)
+
+            return Response(
+                {"success": True, "data": asdict(result)},
+                status=status.HTTP_200_OK
+            )
+
+        except ValueError as e:
+            return Response(
+                {"success": False, "error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logging.getLogger(__name__).error(f"RecipeAnalyzeAPIView error: {e}")
+            return Response(
+                {"success": False, "error": "Внутренняя ошибка сервера"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
