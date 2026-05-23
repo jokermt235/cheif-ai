@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
     
     path('api/storage/', include('storage.urls')),
-    path('api/', include('recipes.urls')),  # Перенесли рецепты в общий префикс api/
+    path('api/', include('recipes.urls')),  
     
     path('api/auth/', include('allauth.urls')),
     path('api/drf-auth/', include('rest_framework.urls', namespace='rest_framework')),
