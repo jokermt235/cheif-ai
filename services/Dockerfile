@@ -22,4 +22,4 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 COPY ./services/start.django.sh /app/start.django.sh
 RUN chmod +x /app/start.django.sh
 
-ENTRYPOINT ["/bin/bash", "app/start.django.sh"]
+ENTRYPOINT ["/app/start.django.sh"]
