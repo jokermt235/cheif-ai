@@ -4,7 +4,6 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-# Импортируем вьюхи Байсала напрямую сюда
 from recipes.views import recipes_page, search_by_ingredients
 from recipes.urls import router as recipes_router
 
@@ -22,12 +21,13 @@ urlpatterns = [
     # 1. Админка
     path('api/admin/', admin.site.urls),
     
-    # 2. Хранилище
+    # 2. Хранилище (перенаправляет в storage.urls)
     path('api/storage/', include('storage.urls')),
     
     # 3. API Рецептов 
     path('api/', include((recipes_router.urls, 'recipes'), namespace='recipes_api')),
-    path('api/search/', search_by_ingredients, name='search'),
+    
+    path('api/search', search_by_ingredients, name='search'),
     
     path('', recipes_page, name='recipes_page'),
     
