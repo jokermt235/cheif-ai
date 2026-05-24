@@ -170,7 +170,7 @@ LOGIN_URL = 'rest_framework:login'
 
 SITE_ID = 1
 
-APPEND_SLASH=True
+APPEND_SLASH=False
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
