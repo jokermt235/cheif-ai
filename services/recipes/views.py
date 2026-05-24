@@ -28,32 +28,38 @@ def recipes_page(request):
 @api_view(['GET'])
 def search_by_ingredients(request):
     ingredients = request.query_params.get('ingredients', '')
+    
     if not ingredients:
         return Response([])
 
-    names = ingredients.strip().split()
-    recipes = Recipe.objects.all()
-    for name in names:
-        recipes = recipes.filter(ingredients__name__icontains=name)
-    recipes = recipes.distinct()
+    names = [i.lower() for i in ingredients.strip().split()]
 
-    if recipes.exists():
-        serializer = RecipeSerializer(recipes, many=True)
-        return Response({"source": "db", "data": serializer.data})
+    recipes = Recipe.objects.prefetch_related('ingredients').all()
 
-    try:
-        service = RecipeService(repository=GrokRecipeRepository())
-        result = service.analyze_from_text(ingredients)
-    except Exception as e:
-        return Response({"error": str(e)}, status=500)
+    result = []
 
-    saved = []
-    for r in result.recipes:
-        recipe = Recipe.objects.create(name=r.name)
-        for ing_name in r.ingredients:
-            ingredient, _ = Ingredient.objects.get_or_create(name=ing_name)
-            recipe.ingredients.add(ingredient)
-        saved.append(recipe)
+    for recipe in recipes:
+        recipe_ingredients = [
+            ing.name.lower()
+            for ing in recipe.ingredients.all()
+        ]
 
-    serializer = RecipeSerializer(saved, many=True)
-    return Response({"source": "ai", "data": serializer.data})
+        missing = [
+            ing for ing in recipe_ingredients
+            if ing not in names
+        ]
+
+        matched = [
+            ing for ing in recipe_ingredients
+            if ing in names
+        ]
+
+        if matched:
+            result.append({
+                "id": recipe.id,
+                "name": recipe.name,
+                "ingredients": recipe_ingredients,
+                "missing_ingredients": missing,
+            })
+
+    return Response(result)

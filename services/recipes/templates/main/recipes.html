@@ -113,7 +113,25 @@
             <div class="recipe-card">
                 ${badge}
                 <div class="recipe-name mt-1">${r.name}</div>
-                <div class="recipe-ing">${Array.isArray(r.ingredients) ? r.ingredients.map(i => i.name || i).join(', ') : ''}</div>
+                                <div class="recipe-ing">
+                    ${
+                        Array.isArray(r.ingredients)
+                        ? r.ingredients.map(i => {
+                            const ingredient = i.name || i;
+
+                            const isMissing =
+                                r.missing_ingredients &&
+                                r.missing_ingredients.includes(ingredient.toLowerCase());
+
+                            return `
+                                <span style="color:${isMissing ? 'red' : '#22c55e'}">
+                                    ${ingredient}
+                                </span>
+                            `;
+                        }).join(', ')
+                        : ''
+                    }
+                </div>
             </div>
         `).join('');
     }
