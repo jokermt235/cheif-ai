@@ -36,7 +36,7 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            const res = await fetch('/api/storage/analyze', {
+            const res = await fetch('/api/storage/analyze/', {
                 method: 'POST',
                 body: formData
             });
