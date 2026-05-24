@@ -20,6 +20,6 @@ COPY services/. /app/
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 COPY ./services/start.django.sh /app/start.django.sh
-RUN chmod +x ./start.django.sh
+RUN chmod +x /app/start.django.sh
 
-CMD ["/bin/bash", "./start.django.sh"]
+ENTRYPOINT ["/bin/bash", "app/start.django.sh"]
