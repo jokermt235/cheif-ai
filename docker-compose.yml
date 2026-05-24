@@ -49,6 +49,21 @@ services:
     networks:
       - default
 
+      
+  ai-service:
+    build:
+      context: .
+      dockerfile: ./ai-service/Dockerfile
+    image: ai-service
+    container_name: ai-service
+    restart: always
+    volumes:
+      - ./ai-service:/app
+    ports:
+      - '8001:8001'
+    networks:
+      - default  
+
 networks:
   default:
     driver: bridge
