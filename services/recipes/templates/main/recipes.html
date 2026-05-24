@@ -6,22 +6,56 @@
 </head>
 <body>
     <h1>Поиск рецептов</h1>
+    
     <input type="text" id="query" placeholder="молоко яйца мука">
     <button onclick="search()">Найти</button>
+
+    <br><br>
+
+    <input type="file" id="photo" accept="image/*">
+    <button onclick="searchByPhoto()">Найти по фото</button>
+
     <div id="results"></div>
 
     <script>
+        // Поиск по тексту
         async function search() {
             const query = document.getElementById('query').value.trim();
             if (!query) return;
 
             const res = await fetch(`/api/search/?ingredients=${encodeURIComponent(query)}`);
             const response = await res.json();
+            showResults(response.data || response);
+        }
+
+        // Поиск по фото
+        async function searchByPhoto() {
+            const file = document.getElementById('photo').files[0];
+            if (!file) return alert('Выбери фото!');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/storage/analyze', {
+                method: 'POST',
+                body: formData
+            });
+            const response = await res.json();
+
+            if (!response.success) {
+                document.getElementById('results').innerHTML = `<p>Ошибка: ${response.error}</p>`;
+                return;
+            }
+
+            // Показываем рецепты от ИИ
+            showResults(response.data.recipes);
+        }
+
+        // Общая функция вывода результатов на экран
+        function showResults(recipes) {
             const container = document.getElementById('results');
 
-            const recipes = response.data || response;
-
-            if (!recipes || recipes.length === 0) {
+            if (!recipes || !recipes.length) {
                 container.innerHTML = '<p>Рецепты не найдены</p>';
                 return;
             }
@@ -29,11 +63,12 @@
             container.innerHTML = recipes.map(r => `
                 <div>
                     <h3>${r.name}</h3>
-                    <p>${r.ingredients.map(i => i.name).join(', ')}</p>
+                    <p>${Array.isArray(r.ingredients) ? r.ingredients.map(i => i.name || i).join(', ') : ''}</p>
                 </div>
             `).join('');
         }
 
+        // Поиск по нажатию Enter
         document.getElementById('query').addEventListener('keypress', e => {
             if (e.key === 'Enter') search();
         });
