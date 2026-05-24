@@ -1,957 +1,638 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChefAI</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #eaf7f1;
-      --screen: #f8fffb;
-      --white: #ffffff;
-      --teal: #0b4c55;
-      --text: #101828;
-      --muted: #6b7280;
-      --green: #13a66b;
-      --green-soft: #e2f5ec;
-      --orange: #ff9914;
-      --orange-soft: #fff4e7;
-      --shadow: 0 20px 45px rgba(15, 37, 48, 0.1);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 18px;
-    }
-
-    body {
-      min-height: 100vh;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      display: flex;
-      justify-content: center;
-      color: var(--text);
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app {
-      position: relative;
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      padding: 42px 24px 104px;
-      background: linear-gradient(180deg, #f4fffb 0%, #ffffff 100%);
-      overflow-x: hidden;
-    }
-
-    .app::before {
-      content: "";
-      position: absolute;
-      top: -120px;
-      right: -120px;
-      width: 260px;
-      height: 260px;
-      background: rgba(19, 166, 107, 0.08);
-      border-radius: 50%;
-    }
-
-    .header {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .title h1 {
-      font-size: 44px;
-      line-height: 1;
-      font-weight: 850;
-      letter-spacing: -1.4px;
-      color: var(--teal);
-    }
-
-    .title p {
-      margin-top: 10px;
-      font-size: 16px;
-      color: var(--teal);
-      opacity: 0.9;
-    }
-
-    .card {
-      position: relative;
-      z-index: 1;
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      padding: 22px 20px;
-      box-shadow: var(--shadow);
-      margin-bottom: 28px;
-    }
-
-    .card h2 {
-      font-size: 24px;
-      line-height: 1.2;
-      margin-bottom: 16px;
-      letter-spacing: -0.4px;
-      color: #111827;
-    }
-
-    .section-subtitle {
-      margin-top: -8px;
-      margin-bottom: 18px;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.45;
-    }
-
-    .input-box {
-      min-height: 60px;
-      border: 1px solid #d8dde7;
-      border-radius: 20px;
-      background: #f7f8fb;
-      display: flex;
-      align-items: center;
-      padding: 0 10px 0 16px;
-      margin-bottom: 18px;
-    }
-
-    .input-box input {
-      width: 100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      font-size: 16px;
-      color: var(--text);
-    }
-
-    .input-box input::placeholder {
-      color: #9297a3;
-    }
-
-    .camera-btn {
-      width: 42px;
-      height: 42px;
-      margin-left: 10px;
-      border: none;
-      border-radius: 14px;
-      background: var(--green-soft);
-      color: var(--teal);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-      transition: 0.2s ease;
-      flex-shrink: 0;
-    }
-
-    .camera-btn:hover {
-      background: #ccebdd;
-      transform: translateY(-1px);
-    }
-
-    .camera-icon {
-      display: block;
-      font-size: 21px;
-      line-height: 1;
-      transform: translateY(-1px);
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 22px;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 13px;
-      border-radius: 18px;
-      font-size: 15px;
-      font-weight: 700;
-      border: 1.5px solid;
-      background: #fff;
-      cursor: pointer;
-      user-select: none;
-      transition: 0.15s ease;
-    }
-
-    .chip:hover {
-      transform: translateY(-1px);
-    }
-
-    .chip .remove {
-      font-size: 18px;
-      opacity: 0.65;
-      margin-left: 4px;
-    }
-
-    .yellow { border-color: #f0b235; background: #fff8e4; }
-    .red { border-color: #e94b4b; background: #fff0f0; }
-    .orange { border-color: #f29d38; background: var(--orange-soft); }
-    .green { border-color: #57b96a; background: #edf9ef; }
-
-    .primary-btn,
-    .secondary-btn,
-    .ghost-btn {
-      width: 100%;
-      min-height: 58px;
-      border: none;
-      border-radius: 32px;
-      font-size: 18px;
-      font-weight: 850;
-      transition: 0.2s ease;
-    }
-
-    .primary-btn {
-      background: linear-gradient(90deg, #ffb844, var(--orange));
-      color: white;
-      box-shadow: 0 14px 26px rgba(255, 153, 20, 0.28);
-    }
-
-    .primary-btn:hover,
-    .secondary-btn:hover,
-    .ghost-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .secondary-btn {
-      margin-top: 12px;
-      background: var(--teal);
-      color: white;
-    }
-
-    .ghost-btn {
-      margin-top: 12px;
-      background: #eef7f2;
-      color: var(--teal);
-      box-shadow: none;
-    }
-
-    .section-title {
-      position: relative;
-      z-index: 1;
-      font-size: 25px;
-      line-height: 1;
-      font-weight: 850;
-      margin-bottom: 20px;
-      letter-spacing: -0.5px;
-    }
-
-    .popular-area {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 28px;
-    }
-
-    .popular-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px 12px;
-      text-align: center;
-    }
-
-    .popular-item {
-      font-size: 32px;
-      cursor: pointer;
-      transition: 0.15s ease;
-    }
-
-    .popular-item:hover {
-      transform: translateY(-2px);
-    }
-
-    .popular-item span {
-      display: block;
-      margin-top: 6px;
-      font-size: 13px;
-      font-weight: 650;
-      color: #111827;
-    }
-
-    .chef-illustration {
-      justify-self: end;
-      width: 160px;
-      min-height: 190px;
-      border-radius: 26px;
-      background: linear-gradient(180deg, #fff7e8, #e8f8ef);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 0 0 1px rgba(11, 76, 85, 0.08);
-      overflow: hidden;
-    }
-
-    .chef-emoji {
-      font-size: 78px;
-      line-height: 1;
-    }
-
-    .chef-illustration p {
-      margin-top: 8px;
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--teal);
-    }
-
-    .tip-card {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: #e4f6ec;
-      border-radius: 26px;
-      padding: 16px;
-      margin-bottom: 28px;
-    }
-
-    .tip-food {
-      width: 66px;
-      height: 66px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: #ffffff;
-      font-size: 36px;
-      flex-shrink: 0;
-    }
-
-    .tip-text h3 {
-      font-size: 21px;
-      color: var(--teal);
-      margin-bottom: 6px;
-    }
-
-    .tip-text p {
-      font-size: 14px;
-      line-height: 1.45;
-      color: #374151;
-    }
-
-    .upload-card {
-      display: none;
-    }
-
-    .upload-area {
-      min-height: 182px;
-      border: 2px dashed #96cfb2;
-      border-radius: 24px;
-      background: #f4fffb;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      text-align: center;
-      margin-bottom: 16px;
-      color: var(--teal);
-      padding: 18px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .upload-area .big-icon {
-      font-size: 48px;
-    }
-
-    .upload-area p {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .preview-image {
-      width: 100%;
-      max-height: 210px;
-      object-fit: cover;
-      border-radius: 18px;
-      display: none;
-    }
-
-    .state-message {
-      display: none;
-      position: relative;
-      z-index: 1;
-      background: #ffffff;
-      border-radius: 22px;
-      padding: 16px;
-      margin-bottom: 24px;
-      box-shadow: 0 10px 30px rgba(15, 37, 48, 0.08);
-      color: var(--teal);
-      font-weight: 800;
-      text-align: center;
-      line-height: 1.45;
-    }
-
-    .state-message.error {
-      color: #9f1239;
-      background: #fff1f2;
-    }
-
-    .results-card {
-      display: none;
-    }
-
-    .results-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .source-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: #edf9ef;
-      color: #0d7a52;
-      font-size: 12px;
-      font-weight: 850;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .recipe-card {
-      border-radius: 24px;
-      padding: 18px;
-      background: #f7fbf9;
-      margin-bottom: 14px;
-      border: 1px solid #e2f1e9;
-    }
-
-    .recipe-card h3 {
-      color: var(--teal);
-      font-size: 22px;
-      line-height: 1.2;
-      margin-bottom: 10px;
-      letter-spacing: -0.3px;
-    }
-
-    .recipe-meta {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .meta-pill {
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: var(--orange-soft);
-      color: #a85c00;
-      font-size: 12px;
-      font-weight: 850;
-    }
-
-    .recipe-card p,
-    .recipe-card li {
-      font-size: 14px;
-      line-height: 1.48;
-      color: #4b5563;
-    }
-
-    .recipe-card ul,
-    .recipe-card ol {
-      margin-left: 18px;
-      margin-top: 8px;
-    }
-
-    .recipe-section-label {
-      margin-top: 12px;
-      font-size: 13px;
-      font-weight: 900;
-      color: #111827;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 430px;
-      height: 82px;
-      background: rgba(255, 255, 255, 0.96);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      box-shadow: 0 -10px 28px rgba(15, 37, 48, 0.08);
-      backdrop-filter: blur(10px);
-      z-index: 5;
-    }
-
-    .nav-item {
-      color: #7b8490;
-      text-align: center;
-      font-size: 23px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .nav-item p {
-      font-size: 12px;
-      margin-top: 3px;
-    }
-
-    .nav-item.active {
-      color: var(--green);
-      font-weight: 850;
-    }
-
-    @media (max-width: 390px) {
-      .app {
-        padding-left: 18px;
-        padding-right: 18px;
-      }
-
-      .title h1 {
-        font-size: 38px;
-      }
-
-      .title p {
-        font-size: 14px;
-      }
-
-      .popular-area {
-        grid-template-columns: 1fr;
-      }
-
-      .chef-illustration {
-        width: 100%;
-        min-height: 132px;
-        flex-direction: row;
-        gap: 12px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChefAI - Turn your ingredients into meals!</title>
+    <style>
+        :root {
+            --primary: #FF9F1C;
+            --primary-light: #FFF5E6;
+            --bg: #F4F9F6;
+            --card-bg: #FFFFFF;
+            --text: #0B2545;
+            --text-muted: #627486;
+            --danger: #9E2A2B;
+            --danger-bg: #FFF0F1;
+            --nav-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin: 20px 0 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #134074;
+            font-weight: 800;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-size: 1.1rem;
+        }
+
+        .screen-card {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .screen-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .screen-card .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: #F0F4F8;
+            border-radius: 20px;
+            padding: 5px 15px;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            background: #FFF;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 12px 5px;
+            font-size: 1.1rem;
+            color: var(--text);
+            outline: none;
+        }
+
+        .scan-btn-inline {
+            background: #E1EBF5;
+            border: none;
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+            min-height: 30px;
+        }
+
+        .chip {
+            background: #E2ECE9;
+            color: #2D6A4F;
+            padding: 8px 14px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .chip.green {
+            background: #D8F3DC;
+            color: #1B4332;
+        }
+
+        .chip .remove {
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            opacity: 0.6;
+        }
+
+        .chip .remove:hover {
+            opacity: 1;
+        }
+
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 159, 28, 0.25);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #E1EBF5;
+            color: #134074;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .state-message {
+            background: var(--danger-bg);
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .state-message.info {
+            background: #E3F2FD;
+            color: #0D47A1;
+        }
+
+        .upload-placeholder {
+            border: 2px dashed #CBD5E1;
+            border-radius: 25px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            background: #FAFAFA;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: none;
+            max-height: 250px;
+            object-fit: cover;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid #E9EFF5;
+        }
+
+        .recipe-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #134074;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .meta-pill {
+            background: #FFF5E6;
+            color: #CC7A00;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .recipe-section-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin: 12px 0 6px;
+        }
+
+        .recipe-card ul, .recipe-card ol {
+            padding-left: 20px;
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .recipe-card li {
+            margin-bottom: 4px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--nav-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            border-top: 1px solid #EAEAEA;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: #2D6A4F;
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-  <main class="app">
-    <header class="header">
-      <div class="title">
-        <h1>ChefAI</h1>
-        <p>Turn your ingredients into meals!</p>
-      </div>
-    </header>
 
-    <section class="card" id="home-section">
-      <h2>What ingredients do you have?</h2>
-      <p class="section-subtitle">Type ingredients manually or upload a photo of what you have at home.</p>
+    <div class="app-container">
+        <header class="header">
+            <h1>ChefAI</h1>
+            <p>Turn your ingredients into meals!</p>
+        </header>
 
-      <div class="input-box">
-        <input id="ingredient-input" type="text" placeholder="Type ingredient and press Enter" autocomplete="off" />
-        <button class="camera-btn" type="button" aria-label="open photo upload" onclick="showUploadScreen()">
-          <span class="camera-icon">📷</span>
-        </button>
-      </div>
+        <div id="state-message" class="state-message"></div>
 
-      <div class="chips" id="ingredient-chips"></div>
+        <main id="home-section">
+            <div class="screen-card">
+                <h2>What ingredients do you have?</h2>
+                <div class="subtitle">Type ingredients manually or upload a photo of what you have at home.</div>
 
-      <button class="primary-btn" type="button" onclick="searchRecipes()">🪄 Generate Recipe</button>
-    </section>
+                <div class="input-wrapper">
+                    <input type="text" id="ingredient-input" placeholder="e.g. персик, garlic, milk">
+                    <button class="scan-btn-inline" onclick="showUploadScreen()" title="Scan photo">📷</button>
+                </div>
 
-    <section class="card upload-card" id="upload-section">
-      <h2>Upload Ingredients Photo</h2>
-      <p class="section-subtitle">Choose a photo and ChefAI will try to understand what ingredients are visible.</p>
+                <div id="ingredient-chips" class="chips-container"></div>
 
-      <label class="upload-area" for="photo-input" id="upload-area">
-        <img id="preview-image" class="preview-image" alt="Selected ingredients photo" />
-        <div id="upload-placeholder">
-          <div class="big-icon">📷</div>
-          <strong>Tap to upload image</strong>
-          <p>Use a clear photo of your ingredients.</p>
-        </div>
-      </label>
+                <button class="btn-main" onclick="searchRecipes()">🪄 Generate Recipe</button>
+            </div>
+        </main>
 
-      <input class="file-input" id="photo-input" type="file" accept="image/*" onchange="handlePhotoPreview(event)" />
+        <section id="upload-section" style="display: none;" class="screen-card">
+            <h2>Upload Ingredients Photo</h2>
+            <div class="subtitle">Choose a photo and ChefAI will try to understand what ingredients are visible.</div>
 
-      <button class="primary-btn" type="button" onclick="searchByPhoto()">Analyze Photo</button>
-      <button class="ghost-btn" type="button" onclick="hideUploadScreen()">Back to Home</button>
-    </section>
+            <input type="file" id="photo-input" accept="image/*" style="display: none;" onchange="handlePhotoPreview(event)">
+            
+            <div class="upload-placeholder" id="upload-placeholder" onclick="document.getElementById('photo-input').click()">
+                <span style="font-size: 2.5rem; display:block; margin-bottom:10px;">📸</span>
+                Tap to select or take a photo
+            </div>
 
-    <div class="state-message" id="state-message"></div>
+            <img id="preview-image" class="preview-image" alt="Preview">
 
-    <section class="card results-card" id="results-section">
-      <div class="results-top">
-        <div>
-          <h2>Recipe Ideas</h2>
-          <p class="section-subtitle" id="results-subtitle">Here’s what you can cook.</p>
-        </div>
-        <span class="source-pill" id="source-pill">✨ AI</span>
-      </div>
-      <div id="recipe-results"></div>
-    </section>
+            <button class="btn-main" onclick="searchByPhoto()">Analyze Photo</button>
+            <button class="btn-secondary" onclick="showHomeScreen()">Back to Home</button>
+        </section>
 
-    <div id="home-extra-content">
-      <h2 class="section-title">Popular Additions</h2>
-
-      <section class="popular-area">
-        <div class="popular-grid">
-          <div class="popular-item" onclick="addIngredient('garlic')">🧄<span>Garlic</span></div>
-          <div class="popular-item" onclick="addIngredient('onion')">🧅<span>Onion</span></div>
-          <div class="popular-item" onclick="addIngredient('olive oil')">🫒<span>Olive Oil</span></div>
-          <div class="popular-item" onclick="addIngredient('chicken')">🍗<span>Chicken</span></div>
-          <div class="popular-item" onclick="addIngredient('spinach')">🥬<span>Spinach</span></div>
-          <div class="popular-item" onclick="addIngredient('carrot')">🥕<span>Carrot</span></div>
-        </div>
-
-        <div class="chef-illustration">
-          <div class="chef-emoji">👩‍🍳</div>
-          <p>AI cooking helper</p>
-        </div>
-      </section>
-
-      <section class="tip-card">
-        <div class="tip-food">🥗</div>
-        <div class="tip-text">
-          <h3>New to cooking?</h3>
-          <p>Let AI suggest simple meals from food you already have.</p>
-        </div>
-      </section>
+        <section id="results-section" style="display: none; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="font-size: 1.5rem;">Recipe Ideas</h2>
+                <span id="source-pill" class="meta-pill" style="background:#E8F5E9; color:#2E7D32;">AI</span>
+            </div>
+            <div id="results-subtitle" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;"></div>
+            
+            <div id="recipe-results"></div>
+        </section>
     </div>
 
-    <nav class="bottom-nav">
-      <div class="nav-item active" onclick="showHomeScreen()">🏠<p>Home</p></div>
-      <div class="nav-item" onclick="showRecipesPage()">📖<p>Recipes</p></div>
-      <div class="nav-item" onclick="showUploadScreen()">📷<p>Scan</p></div>
-      <div class="nav-item">👤<p>Profile</p></div>
+    <nav class="nav-bar">
+        <button class="nav-item active" onclick="showHomeScreen()">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" onclick="showRecipesPage()">
+            <span class="nav-icon">📖</span>
+            <span>Recipes</span>
+        </button>
+        <button class="nav-item" onclick="showUploadScreen()">
+            <span class="nav-icon">📷</span>
+            <span>Scan</span>
+        </button>
     </nav>
-  </main>
 
-  <script>
-    const chipsContainer = document.getElementById('ingredient-chips');
-    const input = document.getElementById('ingredient-input');
-    const stateMessage = document.getElementById('state-message');
-    const resultsSection = document.getElementById('results-section');
-    const recipeResults = document.getElementById('recipe-results');
-    const uploadSection = document.getElementById('upload-section');
-    const homeSection = document.getElementById('home-section');
-    const photoInput = document.getElementById('photo-input');
-    const previewImage = document.getElementById('preview-image');
-    const uploadPlaceholder = document.getElementById('upload-placeholder');
-    const sourcePill = document.getElementById('source-pill');
-    const resultsSubtitle = document.getElementById('results-subtitle');
-    const homeExtraContent = document.getElementById('home-extra-content');
+    <script>
+        const chipsContainer = document.getElementById('ingredient-chips');
+        const input = document.getElementById('ingredient-input');
+        const stateMessage = document.getElementById('state-message');
+        const resultsSection = document.getElementById('results-section');
+        const recipeResults = document.getElementById('recipe-results');
+        const uploadSection = document.getElementById('upload-section');
+        const homeSection = document.getElementById('home-section');
+        const photoInput = document.getElementById('photo-input');
+        const previewImage = document.getElementById('preview-image');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const sourcePill = document.getElementById('source-pill');
+        const resultsSubtitle = document.getElementById('results-subtitle');
 
-    input.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        addIngredient(input.value.trim());
-        input.value = '';
-      }
-    });
-
-    // ИСПРАВЛЕНО: Корректное удаление элементов по нажатию крестика без багов дублирования данных
-    chipsContainer.addEventListener('click', function (event) {
-      if (event.target.classList.contains('remove') || event.target.closest('.remove')) {
-        const chip = event.target.closest('.chip');
-        if (chip) chip.remove();
-      }
-    });
-
-    function addIngredient(name) {
-      if (!name) return;
-
-      const cleanedName = name.trim().toLowerCase();
-      const existing = getIngredients().map(item => item.toLowerCase());
-      if (existing.includes(cleanedName)) return;
-
-      const chip = document.createElement('div');
-      chip.className = 'chip green';
-      chip.dataset.name = cleanedName;
-      chip.innerHTML = `🍽️ ${capitalize(cleanedName)} <span class="remove">×</span>`;
-      chipsContainer.appendChild(chip);
-    }
-
-    function getIngredients() {
-      return Array.from(document.querySelectorAll('.chip'))
-        .map(chip => chip.dataset.name || chip.textContent.replace('×', '').trim())
-        .filter(Boolean);
-    }
-
-    function showMessage(message, type = 'normal') {
-      stateMessage.textContent = message;
-      stateMessage.className = type === 'error' ? 'state-message error' : 'state-message';
-      stateMessage.style.display = 'block';
-    }
-
-    function hideMessage() {
-      stateMessage.style.display = 'none';
-    }
-
-    function showUploadScreen() {
-      uploadSection.style.display = 'block';
-      homeSection.style.display = 'none';
-      resultsSection.style.display = 'none';
-      homeExtraContent.style.display = 'none';
-      hideMessage();
-      setActiveNav('Scan');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function hideUploadScreen() {
-      uploadSection.style.display = 'none';
-      homeSection.style.display = 'block';
-      homeExtraContent.style.display = 'block';
-      setActiveNav('Home');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function showHomeScreen() {
-      uploadSection.style.display = 'none';
-      homeSection.style.display = 'block';
-      homeExtraContent.style.display = 'block';
-      hideMessage();
-      setActiveNav('Home');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function showRecipesPage() {
-      uploadSection.style.display = 'none';
-      homeSection.style.display = 'none';
-      homeExtraContent.style.display = 'none';
-      setActiveNav('Recipes');
-
-      if (recipeResults.innerHTML.trim()) {
-        hideMessage();
-        resultsSection.style.display = 'block';
-      } else {
-        resultsSection.style.display = 'none';
-        showMessage('No generated recipes yet. Generate a recipe first.');
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function setActiveNav(label) {
-      document.querySelectorAll('.nav-item').forEach(item => {
-        const text = item.textContent.trim();
-        item.classList.toggle('active', text.includes(label));
-      });
-    }
-
-    function handlePhotoPreview(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const imageUrl = URL.createObjectURL(file);
-      previewImage.src = imageUrl;
-      previewImage.style.display = 'block';
-      uploadPlaceholder.style.display = 'none';
-    }
-
-    async function searchRecipes() {
-      const ingredients = getIngredients();
-
-      if (ingredients.length < 1) {
-        showMessage('Add at least one ingredient first.', 'error');
-        return;
-      }
-
-      uploadSection.style.display = 'none';
-      homeSection.style.display = 'none';
-      homeExtraContent.style.display = 'none';
-      resultsSection.style.display = 'none';
-      recipeResults.innerHTML = '';
-      showMessage('ChefAI is finding recipes with your ingredients...');
-
-      try {
-        const query = encodeURIComponent(ingredients.join(' '));
-        const response = await fetch(`/api/search/?ingredients=${query}`);
-
-        if (!response.ok) {
-          throw new Error('API request failed');
-        }
-
-        const data = await response.json();
-        hideMessage();
-        renderResults(data.data || data, 'text');
-      } catch (error) {
-        console.error(error);
-        showMessage('Something went wrong. Please try again.', 'error');
-      }
-    }
-
-    async function searchByPhoto() {
-      const file = photoInput.files[0];
-
-      if (!file) {
-        showMessage('Please choose an image first.', 'error');
-        return;
-      }
-
-      resultsSection.style.display = 'none';
-      recipeResults.innerHTML = '';
-      showMessage('Analyzing your photo and generating recipe ideas...');
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-        const response = await fetch('/api/storage/analyze/', {
-          method: 'POST',
-          body: formData
+        // Логика добавления ингредиентов по Enter
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const value = input.value.trim();
+                if (value !== '') {
+                    addIngredient(value);
+                    input.value = '';
+                }
+            }
         });
 
-        if (!response.ok) {
-          throw new Error('Photo analyze request failed');
+        // Удаление тегов по клику на крестик
+        chipsContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove')) {
+                event.target.parentElement.remove();
+            }
+        });
+
+        // Создание визуального "чипса"
+        function addIngredient(name) {
+            if (!name) return;
+            const cleanedName = name.trim();
+            
+            // Защита от дубликатов
+            const existing = getIngredients().map(i => i.toLowerCase());
+            if (existing.includes(cleanedName.toLowerCase())) return;
+
+            const chip = document.createElement('div');
+            chip.className = 'chip green';
+            chip.dataset.name = cleanedName;
+            chip.innerHTML = `🍳 ${capitalize(cleanedName)} <span class="remove">×</span>`;
+            chipsContainer.appendChild(chip);
+            hideMessage();
         }
 
-        const data = await response.json();
-        hideMessage();
-        renderResults(data, 'photo');
-      } catch (error) {
-        console.error(error);
-        showMessage('Could not analyze this photo. Try another image.', 'error');
-      }
-    }
+        // Сбор всех добавленных ингредиентов
+        function getIngredients() {
+            return Array.from(document.querySelectorAll('.chip'))
+                .map(chip => chip.dataset.name || chip.textContent.replace('×', '').replace('🍳', '').trim())
+                .filter(Boolean);
+        }
 
-    function renderResults(data, mode) {
-      const normalized = normalizeResponse(data);
+        function showMessage(message, isError = false) {
+            stateMessage.textContent = message;
+            stateMessage.className = isError ? 'state-message' : 'state-message info';
+            stateMessage.style.display = 'block';
+        }
 
-      if (!normalized.recipes.length && !normalized.singleRecipe) {
-        showMessage('No recipes found. Try different ingredients.', 'error');
-        return;
-      }
+        function hideMessage() {
+            stateMessage.style.display = 'none';
+        }
 
-      sourcePill.textContent = normalized.source === 'db' ? '📚 Database' : '✨ AI';
-      resultsSubtitle.textContent = mode === 'photo'
-        ? 'Generated from your uploaded photo.'
-        : 'Generated from your ingredients.';
+        function showUploadScreen() {
+            uploadSection.style.display = 'block';
+            homeSection.style.display = 'none';
+            resultsSection.style.display = 'none';
+            hideMessage();
+            setActiveNav('Scan');
+        }
 
-      homeExtraContent.style.display = 'none';
-      resultsSection.style.display = 'block';
-      setActiveNav('Recipes');
-      recipeResults.innerHTML = '';
+        function showHomeScreen() {
+            uploadSection.style.display = 'none';
+            homeSection.style.display = 'block';
+            hideMessage();
+            setActiveNav('Home');
+        }
 
-      if (normalized.singleRecipe) {
-        recipeResults.innerHTML = createRecipeCard(normalized.singleRecipe);
-      } else {
-        recipeResults.innerHTML = normalized.recipes.map(recipe => createRecipeCard(recipe)).join('');
-      }
+        function showRecipesPage() {
+            if (recipeResults.innerHTML.trim()) {
+                uploadSection.style.display = 'none';
+                homeSection.style.display = 'none';
+                resultsSection.style.display = 'block';
+                hideMessage();
+                setActiveNav('Recipes');
+            } else {
+                showMessage('No generated recipes yet. Add ingredients on Home screen!', true);
+            }
+        }
 
-      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+        function setActiveNav(label) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const text = item.textContent.trim();
+                item.classList.toggle('active', text.includes(label));
+            });
+        }
 
-    function normalizeResponse(data) {
-      const source = data.source || data.origin || data.type || 'ai';
+        function handlePhotoPreview(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            previewImage.src = URL.createObjectURL(file);
+            previewImage.style.display = 'block';
+            uploadPlaceholder.style.display = 'none';
+        }
 
-      if (Array.isArray(data)) {
-        return { source, recipes: data, singleRecipe: null };
-      }
+        // Поиск по текстовым тегам
+        async function searchRecipes() {
+            // Если пользователь ввел текст, но забыл нажать Enter перед поиском:
+            if (input.value.trim() !== '') {
+                addIngredient(input.value.trim());
+                input.value = '';
+            }
 
-      if (Array.isArray(data.results)) {
-        return { source, recipes: data.results, singleRecipe: null };
-      }
+            const ingredients = getIngredients();
+            if (ingredients.length === 0) {
+                showMessage('Add at least one ingredient first.', true);
+                return;
+            }
 
-      if (Array.isArray(data.recipes)) {
-        return { source, recipes: data.recipes, singleRecipe: null };
-      }
+            showMessage('ChefAI is finding recipes...');
+            recipeResults.innerHTML = '';
 
-      if (data.recipe) {
-        return { source, recipes: [], singleRecipe: data.recipe };
-      }
+            try {
+                const query = encodeURIComponent(ingredients.join(','));
+                const response = await fetch(`/api/search/?ingredients=${query}`);
+                if (!response.ok) throw new Error('API failed');
+                
+                const data = await response.json();
+                hideMessage();
+                renderResults(data, 'text');
+            } catch (error) {
+                console.error(error);
+                showMessage('Something went wrong. Please try again.', true);
+            }
+        }
 
-      if (data.name || data.title || data.recipeName || data.instructions || data.steps) {
-        return { source, recipes: [], singleRecipe: data };
-      }
+        // Анализ по фотографии
+        async function searchByPhoto() {
+            const file = photoInput.files[0];
+            if (!file) {
+                showMessage('Please choose an image first.', true);
+                return;
+            }
 
-      return { source, recipes: [], singleRecipe: null };
-    }
+            showMessage('Analyzing photo and generating recipes...');
+            const formData = new FormData();
+            formData.append('file', file);
 
-    function createRecipeCard(recipe) {
-      const title = recipe.name || recipe.title || recipe.recipeName || 'Recipe Idea';
-      const description = recipe.description || recipe.summary || recipe.text || '';
-      const time = recipe.cookingTime || recipe.cooking_time || recipe.time || recipe.prep_time || 'Quick';
-      const difficulty = recipe.difficulty || recipe.level || 'Easy';
-      const ingredients = normalizeList(recipe.ingredients || recipe.ingredientsUsed || recipe.used_ingredients || recipe.ingredients_used);
-      const missing = normalizeList(recipe.missingIngredients || recipe.missing_ingredients);
-      const steps = normalizeList(recipe.steps || recipe.instructions || recipe.method);
+            try {
+                const response = await fetch('/api/storage/analyze/', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) throw new Error('Analyze failed');
 
-      return `
-        <article class="recipe-card">
-          <h3>${escapeHtml(title)}</h3>
-          <div class="recipe-meta">
-            <span class="meta-pill">⏱ ${escapeHtml(String(time))}</span>
-            <span class="meta-pill">⭐ ${escapeHtml(String(difficulty))}</span>
-            <span class="meta-pill">Uses your ingredients</span>
-          </div>
+                const data = await response.json();
+                hideMessage();
+                renderResults(data, 'photo');
+            } catch (error) {
+                console.error(error);
+                showMessage('Could not analyze this photo. Try another image.', true);
+            }
+        }
 
-          ${description ? `<p>${escapeHtml(String(description)).slice(0, 260)}</p>` : ''}
+        function renderResults(data, mode) {
+            const payload = data.data || data;
+            const recipes = Array.isArray(payload) ? payload : (payload.recipes || []);
 
-          ${ingredients.length ? `
-            <div class="recipe-section-label">Ingredients</div>
-            <ul>${ingredients.map(item => `<li>${escapeHtml(String(item))}</li>`).join('')}</ul>
-          ` : ''}
+            if (recipes.length === 0 && !payload.instructions) {
+                showMessage('No recipes found. Try different ingredients.', true);
+                return;
+            }
 
-          ${missing.length ? `
-            <div class="recipe-section-label">Missing ingredients</div>
-            <ul>${missing.map(item => `<li>${escapeHtml(String(item))}</li>`).join('')}</ul>
-          ` : ''}
+            resultsSubtitle.textContent = mode === 'photo' 
+                ? 'Generated from your uploaded photo.' 
+                : 'Generated from your ingredients.';
 
-          ${steps.length ? `
-            <div class="recipe-section-label">Steps</div>
-            <ol>${steps.map(item => `<li>${escapeHtml(String(item))}</li>`).join('')}</ol>
-          ` : ''}
-        </article>
-      `;
-    }
+            homeSection.style.display = 'none';
+            uploadSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            setActiveNav('Recipes');
 
-    function normalizeList(value) {
-      if (!value) return [];
-      if (Array.isArray(value)) return value;
-      if (typeof value === 'string') {
-        return value
-          .split(/\n|\d+\.|,|;/)
-          .map(item => item.trim())
-          .filter(Boolean);
-      }
-      return [];
-    }
+            if (Array.isArray(recipes)) {
+                recipeResults.innerHTML = recipes.map(createRecipeCard).join('');
+            } else {
+                recipeResults.innerHTML = createRecipeCard(payload);
+            }
+        }
 
-    function capitalize(text) {
-      if (!text) return '';
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    }
+        // Безопасное вытягивание текста из строки или объекта ингредиента
+        function getIngredientText(item) {
+            if (!item) return '';
+            if (typeof item === 'string') return item;
+            if (typeof item === 'object') {
+                return item.name || item.title || item.ingredient || item.text || JSON.stringify(item);
+            }
+            return String(item);
+        }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-  </script>
+        function createRecipeCard(recipe) {
+            const title = recipe.name || recipe.title || 'Delicious Recipe';
+            const time = recipe.cookingTime || recipe.cooking_time || 'Quick';
+            const difficulty = recipe.difficulty || 'Easy';
+            
+            // Парсинг массивов данных
+            const rawIngredients = recipe.ingredients || recipe.ingredientsUsed || [];
+            const ingredients = Array.isArray(rawIngredients) ? rawIngredients : [rawIngredients];
+            
+            const rawSteps = recipe.steps || recipe.instructions || [];
+            const steps = Array.isArray(rawSteps) ? rawSteps : [rawSteps];
+
+            return `
+                <article class="recipe-card">
+                    <h3>${escapeHtml(title)}</h3>
+                    <div class="recipe-meta">
+                        <span class="meta-pill">⏱ ${escapeHtml(String(time))}</span>
+                        <span class="meta-pill">⭐ ${escapeHtml(String(difficulty))}</span>
+                        <span class="meta-pill">Uses your ingredients</span>
+                    </div>
+
+                    ${ingredients.length ? `
+                        <div class="recipe-section-label">Ingredients</div>
+                        <ul>${ingredients.map(item => `<li>${escapeHtml(getIngredientText(item))}</li>`).join('')}</ul>
+                    ` : ''}
+
+                    ${steps.length ? `
+                        <div class="recipe-section-label">Steps</div>
+                        <ol>${steps.map(item => `<li>${escapeHtml(getIngredientText(item))}</li>`).join('')}</ol>
+                    ` : ''}
+                </article>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function capitalize(text) {
+            return text.charAt(0).toUpperCase() + text.slice(1);
+        }
+    </script>
 </body>
 </html>
