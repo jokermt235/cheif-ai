@@ -38,7 +38,7 @@ services:
     depends_on:
       - database
     volumes:
-      # - ./services:/app
+      - ./services:/app
       - /var/www/html/media:/app/media
     env_file:
       - ./config/.env
