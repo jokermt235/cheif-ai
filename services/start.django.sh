@@ -26,5 +26,5 @@ else:
 "
 
 # 3. Настройка и запуск сервера
-export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-" -b 0.0.0.0:8000 --timeout 30 --graceful-timeout 30 --forwarded-allow-ips=* --max-requests=10000 --chdir=/app"}
-gunicorn api.wsgi:application
+export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-" -b 0.0.0.0:10000 --timeout 30 --graceful-timeout 30 --forwarded-allow-ips=* --max-requests=10000 --chdir=/app"}
+exec gunicorn api.wsgi:application
