@@ -95,7 +95,6 @@
       opacity: 0.9;
     }
 
-
     .card {
       position: relative;
       z-index: 1;
@@ -204,6 +203,7 @@
     .chip .remove {
       font-size: 18px;
       opacity: 0.65;
+      margin-left: 4px;
     }
 
     .yellow { border-color: #f0b235; background: #fff8e4; }
@@ -373,6 +373,7 @@
       color: var(--teal);
       padding: 18px;
       overflow: hidden;
+      cursor: pointer;
     }
 
     .upload-area .big-icon {
@@ -517,6 +518,7 @@
       text-align: center;
       font-size: 23px;
       font-weight: 500;
+      cursor: pointer;
     }
 
     .nav-item p {
@@ -576,12 +578,7 @@
         </button>
       </div>
 
-      <div class="chips" id="ingredient-chips">
-        <div class="chip yellow" data-name="eggs">🥚 Eggs <span class="remove">×</span></div>
-        <div class="chip red" data-name="tomato">🍅 Tomato <span class="remove">×</span></div>
-        <div class="chip orange" data-name="cheese">🧀 Cheese <span class="remove">×</span></div>
-        <div class="chip green" data-name="rice">🍚 Rice <span class="remove">×</span></div>
-      </div>
+      <div class="chips" id="ingredient-chips"></div>
 
       <button class="primary-btn" type="button" onclick="searchRecipes()">🪄 Generate Recipe</button>
     </section>
@@ -622,20 +619,20 @@
       <h2 class="section-title">Popular Additions</h2>
 
       <section class="popular-area">
-      <div class="popular-grid">
-        <div class="popular-item" onclick="addIngredient('garlic')">🧄<span>Garlic</span></div>
-        <div class="popular-item" onclick="addIngredient('onion')">🧅<span>Onion</span></div>
-        <div class="popular-item" onclick="addIngredient('olive oil')">🫒<span>Olive Oil</span></div>
-        <div class="popular-item" onclick="addIngredient('chicken')">🍗<span>Chicken</span></div>
-        <div class="popular-item" onclick="addIngredient('spinach')">🥬<span>Spinach</span></div>
-        <div class="popular-item" onclick="addIngredient('carrot')">🥕<span>Carrot</span></div>
-      </div>
+        <div class="popular-grid">
+          <div class="popular-item" onclick="addIngredient('garlic')">🧄<span>Garlic</span></div>
+          <div class="popular-item" onclick="addIngredient('onion')">🧅<span>Onion</span></div>
+          <div class="popular-item" onclick="addIngredient('olive oil')">🫒<span>Olive Oil</span></div>
+          <div class="popular-item" onclick="addIngredient('chicken')">🍗<span>Chicken</span></div>
+          <div class="popular-item" onclick="addIngredient('spinach')">🥬<span>Spinach</span></div>
+          <div class="popular-item" onclick="addIngredient('carrot')">🥕<span>Carrot</span></div>
+        </div>
 
-      <div class="chef-illustration">
-        <div class="chef-emoji">👩‍🍳</div>
-        <p>AI cooking helper</p>
-      </div>
-    </section>
+        <div class="chef-illustration">
+          <div class="chef-emoji">👩‍🍳</div>
+          <p>AI cooking helper</p>
+        </div>
+      </section>
 
       <section class="tip-card">
         <div class="tip-food">🥗</div>
@@ -677,9 +674,12 @@
       }
     });
 
+    // ИСПРАВЛЕНО: Корректное удаление элементов по нажатию крестика без багов дублирования данных
     chipsContainer.addEventListener('click', function (event) {
-      const chip = event.target.closest('.chip');
-      if (chip) chip.remove();
+      if (event.target.classList.contains('remove') || event.target.closest('.remove')) {
+        const chip = event.target.closest('.chip');
+        if (chip) chip.remove();
+      }
     });
 
     function addIngredient(name) {
@@ -798,7 +798,7 @@
 
         const data = await response.json();
         hideMessage();
-        renderResults(data, 'text');
+        renderResults(data.data || data, 'text');
       } catch (error) {
         console.error(error);
         showMessage('Something went wrong. Please try again.', 'error');
@@ -821,7 +821,7 @@
       formData.append('file', file);
 
       try {
-        const response = await fetch('/api/storage/analyze', {
+        const response = await fetch('/api/storage/analyze/', {
           method: 'POST',
           body: formData
         });
