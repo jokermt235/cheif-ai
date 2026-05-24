@@ -1,4 +1,4 @@
-# ChefAI 🍳
+# ChefAI 
 
 **ChefAI** is a smart web application designed to turn your available ingredients into delicious meals. Whether you type your ingredients manually or upload a photo of your fridge, ChefAI uses advanced Machine Learning and Large Language Models to suggest the best recipes, highlighting what you have and what is missing.
 
@@ -6,7 +6,7 @@ The live application is deployed and available at: **[cheif-ai.onrender.com](htt
 
 ---
 
-## 👤 Authors
+##  Authors
 - **Saliev Yntymak** — Project Manager
 - **Baisal Kerimzhanov** — Backend
 - **Aizirek Dokturbek kyzy** — AI Engineer
@@ -15,7 +15,7 @@ The live application is deployed and available at: **[cheif-ai.onrender.com](htt
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
 * **Hybrid Recipe Search:** Instantly checks the local database for existing recipes and calculates matched and missing ingredients (`missing_ingredients`) on the fly for frontend visual indicators.
 * **AI-Powered Generation (Fallback):** If no direct matches are found in the database, the app seamlessly calls **Groq API** to generate creative new recipes and automatically caches them in the database for future use.
@@ -24,7 +24,7 @@ The live application is deployed and available at: **[cheif-ai.onrender.com](htt
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+##  Tech Stack & Architecture
 
 The project is built following **Domain-Driven Design (DDD)** principles, separating the core business logic from framework-specific infrastructure layers.
 
@@ -41,7 +41,7 @@ The project is built following **Domain-Driven Design (DDD)** principles, separa
 
 ---
 
-## 📂 Repository Structure
+##  Repository Structure
 
 ```text
 chef-ai/
@@ -59,7 +59,7 @@ chef-ai/
 └── docker-compose.yml                  # Local Multi-Container Orchestration
 ```
 
-## 🔧 Project Setup (Local Development)
+##  Project Setup (Local Development)
 Follow the steps below to set up and run the entire project ecosystem locally.
 
 ### Prerequisites
@@ -113,7 +113,7 @@ docker-compose up --build
 -- Frontend/Backend Web App: http://localhost:8000
 -- Django Admin Panel: http://localhost:8000/api/admin/
 
-## 📝 API Endpoints Summary
+##  API Endpoints Summary
 ### ***GET /api/recipes/search_by_ingredients/***
 Searches recipes based on available ingredients.
 
