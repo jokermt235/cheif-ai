@@ -22,12 +22,12 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
     
     # 2. Хранилище (перенаправляет в storage.urls)
-    path('api/storage/', include('storage.urls')),
+    path('api/storage', include('storage.urls')),
     
     # 3. API Рецептов 
     path('api/', include((recipes_router.urls, 'recipes'), namespace='recipes_api')),
     
-    path('api/search/', search_by_ingredients, name='search'),
+    path('api/search', search_by_ingredients, name='search'),
     
     path('', recipes_page, name='recipes_page'),
     
