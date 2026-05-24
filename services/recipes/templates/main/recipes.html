@@ -277,7 +277,7 @@
       text-align: center;
     }
 
-    .popular-item {
+    .popular-grid .popular-item {
       font-size: 32px;
       cursor: pointer;
       transition: 0.15s ease;
@@ -497,9 +497,18 @@
 
     .recipe-section-label {
       margin-top: 12px;
+      margin-bottom: 6px;
       font-size: 13px;
       font-weight: 900;
       color: #111827;
+    }
+
+    /* Новый класс для кастомных ингредиентов */
+    .recipe-ing {
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+      margin-top: 6px;
     }
 
     /* Навигация */
@@ -736,6 +745,7 @@
       stateMessage.style.display = 'none';
     }
 
+    // Навигация
     function showUploadScreen() {
       uploadSection.style.display = 'block';
       homeSection.style.display = 'none';
@@ -871,15 +881,13 @@
       return String(item);
     }
 
-    function createRecipeCard(recipe) {
-      const title = recipe.name || recipe.title || 'Delicious Recipe';
-      const time = recipe.cookingTime || recipe.cooking_time || 'Quick';
-      const difficulty = recipe.difficulty || 'Easy';
+    // Функция отрисовки карточки рецепта с интеграцией твоей разметки
+    function createRecipeCard(r) {
+      const title = r.name || r.title || 'Delicious Recipe';
+      const time = r.cookingTime || r.cooking_time || 'Quick';
+      const difficulty = r.difficulty || 'Easy';
       
-      const rawIngredients = recipe.ingredients || recipe.ingredientsUsed || [];
-      const ingredients = Array.isArray(rawIngredients) ? rawIngredients : [rawIngredients];
-      
-      const rawSteps = recipe.steps || recipe.instructions || [];
+      const rawSteps = r.steps || r.instructions || [];
       const steps = Array.isArray(rawSteps) ? rawSteps : [rawSteps];
 
       return `
@@ -891,10 +899,26 @@
             <span class="meta-pill">Uses your ingredients</span>
           </div>
 
-          ${ingredients.length ? `
-            <div class="recipe-section-label">Ingredients</div>
-            <ul>${ingredients.map(item => `<li>${escapeHtml(getIngredientText(item))}</li>`).join('')}</ul>
-          ` : ''}
+          <div class="recipe-section-label">Ingredients</div>
+          <div class="recipe-ing">
+              ${
+                  Array.isArray(r.ingredients)
+                  ? r.ingredients.map(i => {
+                      const ingredient = i.name || i;
+
+                      const isMissing =
+                          r.missing_ingredients &&
+                          r.missing_ingredients.includes(ingredient.toLowerCase());
+
+                      return `
+                          <span style="color:${isMissing ? 'red' : '#22c55e'}">
+                              ${escapeHtml(ingredient)}
+                          </span>
+                      `;
+                  }).join(', ')
+                  : ''
+              }
+          </div>
 
           ${steps.length ? `
             <div class="recipe-section-label">Steps</div>
