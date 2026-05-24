@@ -107,7 +107,7 @@ Run the following command to build the images and start all services in the back
 ``` bash
 docker-compose up --build
 ```
-~Note: The configuration automatically triggers database migrations upon container startup.~
+*Note: The configuration automatically triggers database migrations upon container startup.*
 
 ### 4. Access the Services
 -- Frontend/Backend Web App: http://localhost:8000
