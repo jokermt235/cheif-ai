@@ -4,7 +4,9 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+# Импортируем вьюхи напрямую
 from recipes.views import recipes_page, search_by_ingredients
+from storage.views import RecipeAnalyzeAPIView
 from recipes.urls import router as recipes_router
 
 schema_view = get_schema_view(
@@ -21,14 +23,19 @@ urlpatterns = [
     # 1. Админка
     path('api/admin/', admin.site.urls),
     
-    # 2. Хранилище (перенаправляет в storage.urls)
-    path('api/storage', include('storage.urls')),
+    # 2. Анализ фото (Явный путь БЕЗ слэша на конце, как просит фронтенд)
+    path('api/storage/analyze', RecipeAnalyzeAPIView.as_view(), name='RecipeAnalyze'),
+    
+    # Остальные роуты хранилища (login, refresh, upload) оставляем через include
+    path('api/storage/', include('storage.urls')),
     
     # 3. API Рецептов 
     path('api/', include((recipes_router.urls, 'recipes'), namespace='recipes_api')),
     
-    path('api/search', search_by_ingredients, name='search'),
+    # Текстовый поиск (Явный путь СО слэшем на конце: /api/search/)
+    path('api/search/', search_by_ingredients, name='search'),
     
+    # Главная страница
     path('', recipes_page, name='recipes_page'),
     
     # 5. Авторизация
