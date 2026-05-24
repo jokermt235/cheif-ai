@@ -28,19 +28,49 @@ def recipes_page(request):
 @api_view(['GET'])
 def search_by_ingredients(request):
     ingredients = request.query_params.get('ingredients', '')
+
     if not ingredients:
         return Response([])
 
-    names = ingredients.strip().split()
-    recipes = Recipe.objects.all()
-    for name in names:
-        recipes = recipes.filter(ingredients__name__icontains=name)
-    recipes = recipes.distinct()
+    # Подготовка списка переданных ингредиентов в нижнем регистре
+    names = [i.lower().strip() for i in ingredients.strip().split(',')] if ',' in ingredients else [i.lower().strip() for i in ingredients.strip().split()]
 
-    if recipes.exists():
-        serializer = RecipeSerializer(recipes, many=True)
-        return Response({"source": "db", "data": serializer.data})
+    # --- ЧАСТЬ 1: Поиск по базе данных с вычислением недостающих ингредиентов ---
+    recipes = Recipe.objects.prefetch_related('ingredients').all()
+    db_result = []
 
+    for recipe in recipes:
+        recipe_ingredients = [
+            ing.name.lower()
+            for ing in recipe.ingredients.all()
+        ]
+
+        matched = [
+            ing for ing in recipe_ingredients
+            if ing in names
+        ]
+
+        missing = [
+            ing for ing in recipe_ingredients
+            if ing not in names
+        ]
+
+        if matched:
+            db_result.append({
+                "id": recipe.id,
+                "name": recipe.name,
+                "ingredients": [ing.name for ing in recipe.ingredients.all()], # Возвращаем оригинальные имена для фронтенда
+                "missing_ingredients": missing,
+            })
+
+    # Если в базе данных нашлись совпадения, отдаем их
+    if db_result:
+        return Response({
+            "source": "db",
+            "data": db_result
+        })
+
+    # --- ЧАСТЬ 2: Если в DB ничего не нашли -> Идём к Grok AI ---
     try:
         service = RecipeService(repository=GrokRecipeRepository())
         result = service.analyze_from_text(ingredients)
@@ -50,10 +80,27 @@ def search_by_ingredients(request):
     saved = []
     for r in result.recipes:
         recipe = Recipe.objects.create(name=r.name)
+        recipe_ing_names = []
+        
         for ing_name in r.ingredients:
             ingredient, _ = Ingredient.objects.get_or_create(name=ing_name)
             recipe.ingredients.add(ingredient)
-        saved.append(recipe)
+            recipe_ing_names.append(ing_name.lower())
+        
+        # Вычисляем missing_ingredients для свежих рецептов от ИИ
+        ai_missing = [
+            ing for ing in recipe_ing_names
+            if ing not in names
+        ]
+        
+        saved.append({
+            "id": recipe.id,
+            "name": recipe.name,
+            "ingredients": r.ingredients,
+            "missing_ingredients": ai_missing
+        })
 
-    serializer = RecipeSerializer(saved, many=True)
-    return Response({"source": "ai", "data": serializer.data})
+    return Response({
+        "source": "ai",
+        "data": saved
+    })
