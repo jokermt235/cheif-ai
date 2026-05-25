@@ -18,6 +18,8 @@ import os
 env = environ.Env()
 environ.Env.read_env()
 
+GROK_API_KEY = env('GROK_API_KEY', default='')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,14 +32,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)(nw@d+()ktb$7wa0ss6*uykw+j94p7vh7gf_56x6twqx3=72i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', 'cheif-ai.onrender.com'])
 
 
 # Application definition
 
 DEFAULT_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +52,7 @@ DEFAULT_APPS = [
 THIRD_PARTY_APPS = [
     'django_injector',
     'rest_framework',
+    'drf_yasg',
     'corsheaders',
     'rest_framework.authtoken',
     'django.contrib.sites',
@@ -61,6 +65,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'storage',
+    'recipes',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS +  LOCAL_APPS
@@ -80,12 +85,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'api.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://your-frontend-link.onrender.com",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
 DJANGO_INJECTOR_MODULES = [
-    "stoeage.container.Container",
+    "storage.container.Container",
 ]
 
 TEMPLATES = [
@@ -126,7 +133,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'storage.backends.JWTAuthentication',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
 }
@@ -138,7 +145,7 @@ LOGGING = {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": "/var/log/django.log",
+            "filename": os.path.join(BASE_DIR, "django.log"),
         },
         'console': {
             'class': 'logging.StreamHandler',
@@ -150,8 +157,8 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file"],
-            "level": "DEBUG",
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": True,
         },
     },
@@ -163,7 +170,7 @@ LOGIN_URL = 'rest_framework:login'
 
 SITE_ID = 1
 
-APPEND_SLASH=False
+APPEND_SLASH=True
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -218,3 +225,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': None,
+}

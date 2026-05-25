@@ -5,9 +5,26 @@ set -o pipefail
 set -o nounset
 
 mkdir -p static
+
+# 1. Работа с миграциями и статикой
 python manage.py makemigrations
-#python manage.py migrate --run-syncdb
+python manage.py migrate
+python manage.py loaddata initial_data.json
 python manage.py collectstatic --noinput
 
-export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-" -b 0.0.0.0:8000 --timeout 30 --graceful-timeout 30 --forwarded-allow-ips=* --max-requests=10000 --chdir=/app"}
-gunicorn api.wsgi:application
+# 2. Автоматическое создание суперпользователя
+python manage.py shell -c "
+from storage.models import User; 
+import os;
+email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'test@gmail.com');
+password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', '123451');
+if not User.objects.filter(email=email).exists():
+    User.objects.create_superuser(email=email, password=password)
+    print('Superuser created successfully!')
+else:
+    print('Superuser already exists.')
+"
+
+# 3. Настройка и запуск сервера
+export GUNICORN_CMD_ARGS=${GUNICORN_CMD_ARGS:-" -b 0.0.0.0:10000 --timeout 30 --graceful-timeout 30 --forwarded-allow-ips=* --max-requests=10000 --chdir=/app"}
+exec gunicorn api.wsgi:application

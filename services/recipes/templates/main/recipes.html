@@ -1,0 +1,942 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChefAI - Turn your ingredients into meals!</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #eaf7f1;
+      --screen: #f8fffb;
+      --white: #ffffff;
+      --teal: #0b4c55;
+      --text: #101828;
+      --muted: #6b7280;
+      --green: #13a66b;
+      --green-soft: #e2f5ec;
+      --orange: #ff9914;
+      --orange-soft: #fff4e7;
+      --shadow: 0 20px 45px rgba(15, 37, 48, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      padding: 42px 24px 104px;
+      background: linear-gradient(180deg, #f4fffb 0%, #ffffff 100%);
+      overflow-x: hidden;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 260px;
+      height: 260px;
+      background: rgba(19, 166, 107, 0.08);
+      border-radius: 50%;
+    }
+
+    .header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .title h1 {
+      font-size: 44px;
+      line-height: 1;
+      font-weight: 850;
+      letter-spacing: -1.4px;
+      color: var(--teal);
+    }
+
+    .title p {
+      margin-top: 10px;
+      font-size: 16px;
+      color: var(--teal);
+      opacity: 0.9;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    .card h2 {
+      font-size: 24px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -0.4px;
+      color: #111827;
+    }
+
+    .section-subtitle {
+      margin-top: -8px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .input-box {
+      min-height: 60px;
+      border: 1px solid #d8dde7;
+      border-radius: 20px;
+      background: #f7f8fb;
+      display: flex;
+      align-items: center;
+      padding: 0 10px 0 16px;
+      margin-bottom: 18px;
+    }
+
+    .input-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .input-box input::placeholder {
+      color: #9297a3;
+    }
+
+    .camera-btn {
+      width: 42px;
+      height: 42px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 14px;
+      background: var(--green-soft);
+      color: var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      transition: 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .camera-btn:hover {
+      background: #ccebdd;
+      transform: translateY(-1px);
+    }
+
+    .camera-icon {
+      display: block;
+      font-size: 21px;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+      min-height: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 13px;
+      border-radius: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      border: 1.5px solid;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.15s ease;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .chip .remove {
+      font-size: 18px;
+      opacity: 0.65;
+    }
+
+    .green { border-color: #57b96a; background: #edf9ef; color: #1B4332; }
+
+    .primary-btn,
+    .secondary-btn,
+    .ghost-btn {
+      width: 100%;
+      min-height: 58px;
+      border: none;
+      border-radius: 32px;
+      font-size: 18px;
+      font-weight: 850;
+      transition: 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .primary-btn {
+      background: linear-gradient(90deg, #ffb844, var(--orange));
+      color: white;
+      box-shadow: 0 14px 26px rgba(255, 153, 20, 0.28);
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .ghost-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .secondary-btn {
+      margin-top: 12px;
+      background: var(--teal);
+      color: white;
+    }
+
+    .ghost-btn {
+      margin-top: 12px;
+      background: #eef7f2;
+      color: var(--teal);
+      box-shadow: none;
+    }
+
+    .section-title {
+      position: relative;
+      z-index: 1;
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 850;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .popular-area {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .popular-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px 12px;
+      text-align: center;
+    }
+
+    .popular-grid .popular-item {
+      font-size: 32px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      user-select: none;
+    }
+
+    .popular-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .popular-item span {
+      display: block;
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 650;
+      color: #111827;
+    }
+
+    .chef-illustration {
+      justify-self: end;
+      width: 160px;
+      min-height: 190px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, #fff7e8, #e8f8ef);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 0 1px rgba(11, 76, 85, 0.08);
+      overflow: hidden;
+    }
+
+    .chef-emoji {
+      font-size: 78px;
+      line-height: 1;
+    }
+
+    .chef-illustration p {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--teal);
+    }
+
+    .tip-card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #e4f6ec;
+      border-radius: 26px;
+      padding: 16px;
+      margin-bottom: 28px;
+    }
+
+    .tip-food {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #ffffff;
+      font-size: 36px;
+      flex-shrink: 0;
+    }
+
+    .tip-text h3 {
+      font-size: 21px;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+
+    .tip-text p {
+      font-size: 14px;
+      line-height: 1.45;
+      color: #374151;
+    }
+
+    /* Экраны */
+    .upload-card {
+      display: none;
+    }
+
+    .upload-area {
+      min-height: 182px;
+      border: 2px dashed #96cfb2;
+      border-radius: 24px;
+      background: #f4fffb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      text-align: center;
+      margin-bottom: 16px;
+      color: var(--teal);
+      padding: 18px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .upload-area .big-icon {
+      font-size: 48px;
+    }
+
+    .upload-area p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-height: 210px;
+      object-fit: cover;
+      border-radius: 18px;
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    /* Сообщения о статусе */
+    .state-message {
+      display: none;
+      position: relative;
+      z-index: 1;
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 30px rgba(15, 37, 48, 0.08);
+      color: var(--teal);
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .state-message.error {
+      color: #9f1239;
+      background: #fff1f2;
+    }
+
+    .results-card {
+      display: none;
+    }
+
+    .results-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #edf9ef;
+      color: #0d7a52;
+      font-size: 12px;
+      font-weight: 850;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .recipe-card {
+      border-radius: 24px;
+      padding: 18px;
+      background: #f7fbf9;
+      margin-bottom: 14px;
+      border: 1px solid #e2f1e9;
+    }
+
+    .recipe-card h3 {
+      color: var(--teal);
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .recipe-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .meta-pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--orange-soft);
+      color: #a85c00;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .recipe-card p,
+    .recipe-card li {
+      font-size: 14px;
+      line-height: 1.48;
+      color: #4b5563;
+    }
+
+    .recipe-card ul,
+    .recipe-card ol {
+      margin-left: 18px;
+      margin-top: 8px;
+    }
+
+    .recipe-section-label {
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 900;
+      color: #111827;
+    }
+
+    /* Новый класс для кастомных ингредиентов */
+    .recipe-ing {
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    /* Навигация */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: 82px;
+      background: rgba(255, 255, 255, 0.96);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -10px 28px rgba(15, 37, 48, 0.08);
+      backdrop-filter: blur(10px);
+      z-index: 5;
+    }
+
+    .nav-item {
+      color: #7b8490;
+      text-align: center;
+      font-size: 23px;
+      font-weight: 500;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-item p {
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .nav-item.active {
+      color: var(--green);
+      font-weight: 850;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 390px) {
+      .app {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .title h1 {
+        font-size: 38px;
+      }
+
+      .title p {
+        font-size: 14px;
+      }
+
+      .popular-area {
+        grid-template-columns: 1fr;
+      }
+
+      .chef-illustration {
+        width: 100%;
+        min-height: 132px;
+        flex-direction: row;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="title">
+        <h1>ChefAI</h1>
+        <p>Turn your ingredients into meals!</p>
+      </div>
+    </header>
+
+    <div id="state-message" class="state-message"></div>
+
+    <div id="home-section">
+      <div class="card">
+        <h2>What ingredients do you have?</h2>
+        <p class="section-subtitle">Type ingredients manually or upload a photo of what you have at home.</p>
+
+        <div class="input-box">
+          <input type="text" id="ingredient-input" placeholder="e.g. milk, egg, butter" />
+          <button class="camera-btn" onclick="showUploadScreen()" title="Scan photo">
+            <span class="camera-icon">📷</span>
+          </button>
+        </div>
+
+        <div id="ingredient-chips" class="chips"></div>
+
+        <button class="primary-btn" onclick="searchRecipes()">🪄 Find Recipe</button>
+      </div>
+
+      <h2 class="section-title">Popular items</h2>
+      <div class="popular-area">
+        <div class="popular-grid">
+          <div class="popular-item" onclick="addIngredient('egg')">🥚<span>Egg</span></div>
+          <div class="popular-item" onclick="addIngredient('milk')">🥛<span>Milk</span></div>
+          <div class="popular-item" onclick="addIngredient('cheese')">🧀<span>Cheese</span></div>
+          <div class="popular-item" onclick="addIngredient('tomato')">🍅<span>Tomato</span></div>
+          <div class="popular-item" onclick="addIngredient('chicken')">🍗<span>Chicken</span></div>
+          <div class="popular-item" onclick="addIngredient('onion')">🧅<span>Onion</span></div>
+        </div>
+
+        <div class="chef-illustration">
+          <span class="chef-emoji">👨‍🍳</span>
+          <p>ChefAI Bot</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-food">🥑</div>
+        <div class="tip-text">
+          <h3>Daily Tip</h3>
+          <p>To keep avocados fresh longer, store them with a piece of onion inside an airtight container!</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="upload-section" class="card upload-card">
+      <h2>Upload Ingredients Photo</h2>
+      <p class="section-subtitle">Choose a photo and ChefAI will try to understand what ingredients are visible.</p>
+
+      <input type="file" id="photo-input" class="file-input" accept="image/*" onchange="handlePhotoPreview(event)" />
+      
+      <div class="upload-area" id="upload-placeholder" onclick="document.getElementById('photo-input').click()">
+        <span class="big-icon">📸</span>
+        <p>Tap to select or take a photo</p>
+      </div>
+
+      <img id="preview-image" class="preview-image" alt="Preview" />
+
+      <button class="primary-btn" onclick="searchByPhoto()">Analyze Photo</button>
+      <button class="ghost-btn" onclick="showHomeScreen()">Back to Home</button>
+    </div>
+
+    <div id="results-section" class="results-card">
+      <div class="results-top">
+        <h2 class="section-title" style="margin-bottom: 0;">Recipe Ideas</h2>
+        <span id="source-pill" class="source-pill">✨ AI</span>
+      </div>
+      <p id="results-subtitle" class="section-subtitle" style="margin-bottom: 20px;"></p>
+      
+      <div id="recipe-results"></div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="showHomeScreen()">
+        <span>🏠</span>
+        <p>Home</p>
+      </button>
+      <button class="nav-item" onclick="showRecipesPage()">
+        <span>📖</span>
+        <p>Recipes</p>
+      </button>
+      <button class="nav-item" onclick="showUploadScreen()">
+        <span>📷</span>
+        <p>Scan</p>
+      </button>
+    </nav>
+  </main>
+
+  <script>
+    const chipsContainer = document.getElementById('ingredient-chips');
+    const input = document.getElementById('ingredient-input');
+    const stateMessage = document.getElementById('state-message');
+    const resultsSection = document.getElementById('results-section');
+    const recipeResults = document.getElementById('recipe-results');
+    const uploadSection = document.getElementById('upload-section');
+    const homeSection = document.getElementById('home-section');
+    const photoInput = document.getElementById('photo-input');
+    const previewImage = document.getElementById('preview-image');
+    const uploadPlaceholder = document.getElementById('upload-placeholder');
+    const sourcePill = document.getElementById('source-pill');
+    const resultsSubtitle = document.getElementById('results-subtitle');
+
+    // Добавление тега по кнопке Enter
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const value = input.value.trim();
+        if (value !== '') {
+          addIngredient(value);
+          input.value = '';
+        }
+      }
+    });
+
+    // Удаление тегов по нажатию
+    chipsContainer.addEventListener('click', function (event) {
+      if (event.target.classList.contains('remove') || event.target.closest('.chip')) {
+        const chip = event.target.classList.contains('chip') ? event.target : event.target.parentElement;
+        chip.remove();
+      }
+    });
+
+    // Функция создания тега продукта
+    function addIngredient(name) {
+      if (!name) return;
+      const cleanedName = name.trim();
+      
+      const existing = getIngredients().map(i => i.toLowerCase());
+      if (existing.includes(cleanedName.toLowerCase())) return;
+
+      const chip = document.createElement('div');
+      chip.className = 'chip green';
+      chip.dataset.name = cleanedName;
+      chip.innerHTML = `${capitalize(cleanedName)} <span class="remove">×</span>`;
+      chipsContainer.appendChild(chip);
+      hideMessage();
+    }
+
+    // Сбор текущего массива продуктов
+    function getIngredients() {
+      return Array.from(document.querySelectorAll('.chip'))
+        .map(chip => chip.dataset.name || chip.textContent.replace('×', '').trim())
+        .filter(Boolean);
+    }
+
+    function showMessage(message, isError = false) {
+      stateMessage.textContent = message;
+      stateMessage.className = isError ? 'state-message error' : 'state-message';
+      stateMessage.style.display = 'block';
+    }
+
+    function hideMessage() {
+      stateMessage.style.display = 'none';
+    }
+
+    // Навигация
+    function showUploadScreen() {
+      uploadSection.style.display = 'block';
+      homeSection.style.display = 'none';
+      resultsSection.style.display = 'none';
+      hideMessage();
+      setActiveNav('Scan');
+    }
+
+    function showHomeScreen() {
+      uploadSection.style.display = 'none';
+      homeSection.style.display = 'block';
+      resultsSection.style.display = 'none';
+      hideMessage();
+      setActiveNav('Home');
+    }
+
+    function showRecipesPage() {
+      if (recipeResults.innerHTML.trim()) {
+        uploadSection.style.display = 'none';
+        homeSection.style.display = 'none';
+        resultsSection.style.display = 'block';
+        hideMessage();
+        setActiveNav('Recipes');
+      } else {
+        showMessage('No generated recipes yet. Add ingredients on Home screen!', true);
+      }
+    }
+
+    function setActiveNav(label) {
+      document.querySelectorAll('.nav-item').forEach(item => {
+        const text = item.textContent.trim();
+        item.classList.toggle('active', text.includes(label));
+      });
+    }
+
+    function handlePhotoPreview(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      previewImage.src = URL.createObjectURL(file);
+      previewImage.style.display = 'block';
+      uploadPlaceholder.style.display = 'none';
+    }
+
+    // Отправка текстовых продуктов в API
+    async function searchRecipes() {
+      if (input.value.trim() !== '') {
+        addIngredient(input.value.trim());
+        input.value = '';
+      }
+
+      const ingredients = getIngredients();
+      if (ingredients.length === 0) {
+        showMessage('Add at least one ingredient first.', true);
+        return;
+      }
+
+      showMessage('ChefAI is finding recipes...');
+      recipeResults.innerHTML = '';
+
+      try {
+        const query = encodeURIComponent(ingredients.join(','));
+        const response = await fetch(`/api/search/?ingredients=${query}`);
+        if (!response.ok) throw new Error('API failed');
+        
+        const data = await response.json();
+        hideMessage();
+        renderResults(data, 'text');
+      } catch (error) {
+        console.error(error);
+        showMessage('Something went wrong. Please try again.', true);
+      }
+    }
+
+    // Отправка фотографии в API аналитики
+    async function searchByPhoto() {
+      const file = photoInput.files[0];
+      if (!file) {
+        showMessage('Please choose an image first.', true);
+        return;
+      }
+
+      showMessage('Analyzing photo and generating recipes...');
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/api/storage/analyze/', {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) throw new Error('Analyze failed');
+
+        const data = await response.json();
+        hideMessage();
+        renderResults(data, 'photo');
+      } catch (error) {
+        console.error(error);
+        showMessage('Could not analyze this photo. Try another image.', true);
+      }
+    }
+
+    function renderResults(data, mode) {
+      const payload = data.data || data;
+      const recipes = Array.isArray(payload) ? payload : (payload.recipes || []);
+
+      if (recipes.length === 0 && !payload.instructions) {
+        showMessage('No recipes found. Try different ingredients.', true);
+        return;
+      }
+
+      resultsSubtitle.textContent = mode === 'photo' 
+        ? 'Generated from your uploaded photo.' 
+        : 'Generated from your ingredients.';
+
+      homeSection.style.display = 'none';
+      uploadSection.style.display = 'none';
+      resultsSection.style.display = 'block';
+      setActiveNav('Recipes');
+
+      if (Array.isArray(recipes)) {
+        recipeResults.innerHTML = recipes.map(createRecipeCard).join('');
+      } else {
+        recipeResults.innerHTML = createRecipeCard(payload);
+      }
+    }
+
+    function getIngredientText(item) {
+      if (!item) return '';
+      if (typeof item === 'string') return item;
+      if (typeof item === 'object') {
+        return item.name || item.title || item.ingredient || item.text || JSON.stringify(item);
+      }
+      return String(item);
+    }
+
+    // Функция отрисовки карточки рецепта с интеграцией твоей разметки
+    function createRecipeCard(r) {
+      const title = r.name || r.title || 'Delicious Recipe';
+      const time = r.cookingTime || r.cooking_time || 'Quick';
+      const difficulty = r.difficulty || 'Easy';
+      
+      const rawSteps = r.steps || r.instructions || [];
+      const steps = Array.isArray(rawSteps) ? rawSteps : [rawSteps];
+
+      return `
+        <article class="recipe-card">
+          <h3>${escapeHtml(title)}</h3>
+          <div class="recipe-meta">
+            <span class="meta-pill">⏱ ${escapeHtml(String(time))}</span>
+            <span class="meta-pill">⭐ ${escapeHtml(String(difficulty))}</span>
+            <span class="meta-pill">Uses your ingredients</span>
+          </div>
+
+          <div class="recipe-section-label">Ingredients</div>
+          <div class="recipe-ing">
+              ${
+                  Array.isArray(r.ingredients)
+                  ? r.ingredients.map(i => {
+                      const ingredient = i.name || i;
+
+                      const isMissing =
+                          r.missing_ingredients &&
+                          r.missing_ingredients.includes(ingredient.toLowerCase());
+
+                      return `
+                          <span style="color:${isMissing ? 'red' : '#22c55e'}">
+                              ${escapeHtml(ingredient)}
+                          </span>
+                      `;
+                  }).join(', ')
+                  : ''
+              }
+          </div>
+
+          ${steps.length ? `
+            <div class="recipe-section-label">Steps</div>
+            <ol>${steps.map(item => `<li>${escapeHtml(getIngredientText(item))}</li>`).join('')}</ol>
+          ` : ''}
+        </article>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function capitalize(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+  </script>
+</body>
+</html>

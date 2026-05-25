@@ -3,7 +3,7 @@ services:
     container_name: server-nginx
     image: nginx:latest
     volumes:
-      - /var/www/html:/usr/share/nginx/html
+      - /var/www/html/static:/usr/share/nginx/html/static:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
@@ -14,9 +14,9 @@ services:
       - backend
     networks:
       - default
-        
+
   database:
-    image: postgres:alpine
+    image: postgres:16-alpine
     container_name: storage-database
     restart: always
     env_file:
@@ -41,12 +41,27 @@ services:
       - ./services:/app
       - /var/www/html/media:/app/media
     env_file:
-      ./config/.env
+      - ./config/.env
     ports:
-      - '8000:8000'
-    command: sh -c  "chmod +x /app/start.django.sh && /app/start.django.sh"
+      - '8000:10000'
+    command: sh -c "chmod +x /app/start.django.sh && sh /app/start.django.sh"
     networks:
       - default
+
+      
+  ai-service:
+    build:
+      context: .
+      dockerfile: ./ai-service/Dockerfile
+    image: ai-service
+    container_name: ai-service
+    restart: always
+    volumes:
+      - ./ai-service:/app
+    ports:
+      - '8001:8001'
+    networks:
+      - default  
 
 networks:
   default:
